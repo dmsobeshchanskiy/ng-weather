@@ -1,0 +1,30 @@
+<div class="well">
+  <h3>Cache management</h3>
+
+  <form class="main-block" [formGroup]="cacheSetupForm">
+    <div class="marged">
+      <div>
+        <label class="marged">Weather cache time (sec): </label>
+        <input type="text" formControlName="weatherCacheTime">
+      </div>
+      <div>
+        <label class="marged">Forecast cache time (sec): </label>
+        <input type="text" formControlName="forecastCacheTime">
+      </div>
+    </div>
+    <div>
+      <button class="btn btn-primary marged apply-btn" (click)="applyCacheSetup()"
+              [disabled]="!cacheSetupForm.valid">
+        Apply
+      </button>
+    </div>
+  </form>
+  <div class="clears-block">
+    <button class="btn btn-warning marged" (click)="clearWeatherCache()">
+      Clear weather cache
+    </button>
+    <button class="btn btn-warning marged" (click)="clearForecastCache()">
+      Clear forecast cache
+    </button>
+  </div>  
+</div>

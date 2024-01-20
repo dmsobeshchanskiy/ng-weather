@@ -1,16 +1,18 @@
 import { HttpEvent, HttpEventType, HttpHandler,
         HttpInterceptor, HttpRequest, HttpResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { CacheService } from '../cache/cache.service';
 import { FORECAST_ACTION, WEATHER_ACTION } from '../constants';
 import { CacheRecord } from '../cache/cache-record';
+import { ICacheProvider, ICacheProviderToken } from '../cache/i-cache-provider';
+import { CurrentConditions } from '../models/current-conditions.type';
+import { Forecast } from '../models/forecast.type';
 
 @Injectable()
 export class CachingInterceptor implements HttpInterceptor {
 
-  constructor(private cacheService: CacheService) {}
+  constructor(@Inject(ICacheProviderToken) private cacheService: ICacheProvider) {}
   
   public intercept(req: HttpRequest<any>, handler: HttpHandler): Observable<HttpEvent<any>> {
     if (req.url.indexOf(WEATHER_ACTION) > 0) {
@@ -35,7 +37,7 @@ export class CachingInterceptor implements HttpInterceptor {
 
   private handleCachedRequest(req: HttpRequest<any>, handler: HttpHandler,
                               getCachedRecord: (zipcode: string) => CacheRecord,
-                              saveRecordToCache: (zipcode: string, record: CacheRecord) => void): Observable<HttpEvent<any>> {
+                              saveRecordToCache: (zipcode: string, data: CurrentConditions | Forecast) => void): Observable<HttpEvent<any>> {
     const zipcode = req.params.get('zip');
     const cachedRecord = getCachedRecord(zipcode)
     if (cachedRecord) {

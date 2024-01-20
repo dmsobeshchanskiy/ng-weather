@@ -2,18 +2,46 @@ import { Injectable } from '@angular/core';
 import { CacheRecord } from './cache-record';
 import { CurrentConditions } from '../models/current-conditions.type';
 import { Forecast } from '../models/forecast.type';
+import { ICacheManager } from './i-cache-manager';
+import { ICacheProvider } from './i-cache-provider';
+import { CacheSetup } from './cache-setup';
 
 @Injectable()
-export class CacheService {
+export class CacheService implements ICacheManager, ICacheProvider {
 
-  private readonly weatherCacheTTLsec = 20; 
-  private readonly forecastCacheTTLsec = 20; 
   private readonly weatherCacheKey: string = "weather-cached-records";
   private readonly forecastCacheKey: string = "forecast-cached-records";
+  private readonly cacheSetupKey: string = "cache-setup-key";
 
   constructor() { }
+  
+  public getWeatherCacheSec(): number {
+    return this.getOrCreateCacheSetup().weatherMaxSec;
+  }
+  
+  public getForecastCacheSec(): number {
+    return this.getOrCreateCacheSetup().forecastMaxSec;
+  }
+  
+  public applyCacheTimings(weatherSec: number, forecastSec: number): void {
+    const setup: CacheSetup = {
+      weatherMaxSec: weatherSec, 
+      forecastMaxSec: forecastSec
+    };
+    localStorage.setItem(this.cacheSetupKey, JSON.stringify(setup));
+  }
+  
+  public clearWeatherCache(): void {
+    localStorage.setItem(this.weatherCacheKey, '');
+  }
+  
+  public clearForecastCache(): void {
+    localStorage.setItem(this.forecastCacheKey, '');
+  }
 
-  public saveWeatherToCache = (zipcode: string, condition: any): void => {
+
+
+  public saveWeatherToCache = (zipcode: string, condition: CurrentConditions): void => {
     this.saveToCache(this.weatherCacheKey, zipcode, condition);
   }
 
@@ -22,10 +50,10 @@ export class CacheService {
       return undefined;
     }
     const record = this.getCachedRecords(this.weatherCacheKey)?.find(r => r.zip === zipcode);
-    return this.isCacheRecordValid(record, this.weatherCacheTTLsec) ? record : undefined;
+    return this.isCacheRecordValid(record, this.getWeatherCacheSec()) ? record : undefined;
   }
 
-  public saveForecastToCache = (zipcode: string, condition: any): void => {
+  public saveForecastToCache = (zipcode: string, condition: Forecast): void => {
     this.saveToCache(this.forecastCacheKey, zipcode, condition);
   }
 
@@ -34,7 +62,7 @@ export class CacheService {
       return undefined;
     }
     const record = this.getCachedRecords(this.forecastCacheKey)?.find(r => r.zip === zipcode);
-    return this.isCacheRecordValid(record, this.forecastCacheTTLsec) ? record : undefined;
+    return this.isCacheRecordValid(record, this.getForecastCacheSec()) ? record : undefined;
   }
 
 
@@ -82,6 +110,21 @@ export class CacheService {
       cachedRecords = JSON.parse(cacheString);
     }
     return cachedRecords;
+  }
+
+  private getOrCreateCacheSetup(): CacheSetup {
+    let setup: CacheSetup;
+    const cacheSetupString = localStorage.getItem(this.cacheSetupKey);
+    if (cacheSetupString) {
+      setup = JSON.parse(cacheSetupString);
+    } else {
+      setup = {
+        weatherMaxSec: 7200,
+        forecastMaxSec: 7200
+      }
+      localStorage.setItem(this.cacheSetupKey, JSON.stringify(setup));
+    }
+    return setup;
   }
 
 }

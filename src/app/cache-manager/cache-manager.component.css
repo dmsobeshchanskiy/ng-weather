@@ -1,0 +1,15 @@
+.marged {
+    margin-right: 15px;
+}
+
+.main-block {
+    display: flex;
+}
+
+.clears-block {
+    margin-top: 5px;
+}
+
+.apply-btn {
+    height: 54px;
+}
