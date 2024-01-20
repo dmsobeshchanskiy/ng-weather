@@ -1,10 +1,14 @@
 import {Injectable, Signal, signal} from '@angular/core';
-import {Observable} from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
+import {Observable, forkJoin, of } from 'rxjs';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 
 import {HttpClient} from '@angular/common/http';
 import {CurrentConditions} from './current-conditions/current-conditions.type';
 import {ConditionsAndZip} from './conditions-and-zip.type';
 import {Forecast} from './forecasts-list/forecast.type';
+import { LocationService } from './location.service';
+
 
 @Injectable()
 export class WeatherService {
@@ -14,7 +18,30 @@ export class WeatherService {
   static ICON_URL = 'https://raw.githubusercontent.com/udacity/Sunshine-Version-2/sunshine_master/app/src/main/res/drawable-hdpi/';
   private currentConditions = signal<ConditionsAndZip[]>([]);
 
-  constructor(private http: HttpClient) { }
+  // TODO: try to remove this
+  private zipCodes: string[];
+
+  constructor(private http: HttpClient, 
+              private locationService: LocationService) {
+                
+    toObservable(this.locationService.getLocationsSignal()).pipe(
+      tap(zipCodes => this.zipCodes = zipCodes),
+      switchMap(zipCodes => {
+        return forkJoin(zipCodes.map(zipcode => {
+          return this.http.get<CurrentConditions>(this.getUrl(zipcode)).pipe(catchError(e => of(undefined)))
+        }))
+      }),
+      catchError(e => of([]))
+    ).subscribe(conditions => {
+      const zipConditions = [];
+      for (let i = 0; i < this.zipCodes.length; i++) {
+        if (conditions[i]) {
+          zipConditions.push({zip: this.zipCodes[i], data: conditions[i]})
+        }
+      }
+      this.currentConditions.set(zipConditions);
+    });
+  }
 
   addCurrentConditions(zipcode: string): void {
     // Here we make a request to get the current conditions data from the API. Note the use of backticks and an expression to insert the zipcode
@@ -59,4 +86,10 @@ export class WeatherService {
       return WeatherService.ICON_URL + "art_clear.png";
   }
 
+  private getUrl(zipcode: string): string {
+    return `${WeatherService.URL}/weather?zip=${zipcode},us&units=imperial&APPID=${WeatherService.APPID}`;
+  }
+
 }
+
+
