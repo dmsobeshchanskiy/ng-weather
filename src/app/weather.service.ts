@@ -28,7 +28,7 @@ export class WeatherService {
       tap(zipCodes => this.zipCodes = zipCodes),
       switchMap(zipCodes => {
         return forkJoin(zipCodes.map(zipcode => {
-          return this.http.get<CurrentConditions>(this.getUrl(zipcode)).pipe(catchError(e => of(undefined)))
+          return this.http.get<CurrentConditions>(this.getConditionUrl(zipcode)).pipe(catchError(e => of(undefined)))
         }))
       }),
       catchError(e => of([]))
@@ -45,7 +45,7 @@ export class WeatherService {
 
   addCurrentConditions(zipcode: string): void {
     // Here we make a request to get the current conditions data from the API. Note the use of backticks and an expression to insert the zipcode
-    this.http.get<CurrentConditions>(this.getUrl(zipcode))
+    this.http.get<CurrentConditions>(this.getConditionUrl(zipcode))
       .subscribe(data => this.currentConditions.update(conditions => [...conditions, {zip: zipcode, data}]));
   }
 
@@ -86,7 +86,7 @@ export class WeatherService {
       return WeatherService.ICON_URL + "art_clear.png";
   }
 
-  private getUrl(zipcode: string): string {
+  private getConditionUrl(zipcode: string): string {
     return `${WeatherService.URL}/weather?zip=${zipcode},us&units=imperial&APPID=${WeatherService.APPID}`;
   }
 
