@@ -4,9 +4,9 @@ import {Observable, forkJoin, of } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 
 import {HttpClient} from '@angular/common/http';
-import {CurrentConditions} from './current-conditions/current-conditions.type';
+import {CurrentConditions} from './models/current-conditions.type';
 import {ConditionsAndZip} from './conditions-and-zip.type';
-import {Forecast} from './forecasts-list/forecast.type';
+import {Forecast} from './models/forecast.type';
 import { LocationService } from './location.service';
 
 
