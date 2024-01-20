@@ -11,9 +11,11 @@ import { CurrentConditionsComponent } from './current-conditions/current-conditi
 import { MainPageComponent } from './main-page/main-page.component';
 import {RouterModule} from "@angular/router";
 import {routing} from "./app.routing";
-import {HttpClientModule} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { CachingInterceptor } from './interceptors/caching-interceptor.interceptor';
+import { CacheService } from './cache/cache.service';
 
 @NgModule({
   declarations: [
@@ -31,7 +33,10 @@ import { environment } from '../environments/environment';
     routing,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
   ],
-  providers: [LocationService, WeatherService],
+  providers: [
+    LocationService, WeatherService, CacheService,
+    { provide: HTTP_INTERCEPTORS, useClass: CachingInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
