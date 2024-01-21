@@ -35,6 +35,9 @@ export class TabsComponent {
   @Output()
   public activeTabIdChanged = new EventEmitter<string>();
 
+  @Output()
+  public closeTabClicked = new EventEmitter<string>();
+
 
   public tabs: TabDirective[];
   public templateToRender: TemplateRef<any>;
@@ -52,7 +55,7 @@ export class TabsComponent {
 
   public onCloseTabClick(tab: TabDirective, event: MouseEvent): void {
     event.stopImmediatePropagation();
-    tab.closeTabClicked.emit(null);
+    this.closeTabClicked.emit(tab.tabId);
   }
 
 
