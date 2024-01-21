@@ -19,16 +19,24 @@ import { CacheService } from './cache/cache.service';
 import { CacheManagerComponent } from './cache-manager/cache-manager.component';
 import { ICacheProviderToken } from './cache/i-cache-provider';
 import { ICacheManagerToken } from './cache/i-cache-manager';
+import { TabsComponent } from './tabs/tabs/tabs.component';
+import { TabDirective } from './tabs/tabs/tab.directive';
+import { WeatherCardComponent } from './weather-card/weather-card.component';
+import { LocationNamePipe } from './pipes/location-name.pipe';
 
 @NgModule({
-  declarations: [	
+  declarations: [		
     AppComponent,
     ZipcodeEntryComponent,
     ForecastsListComponent,
     CurrentConditionsComponent,
     MainPageComponent,
-    CacheManagerComponent
-  ],
+    CacheManagerComponent,
+    TabsComponent,
+    TabDirective,
+    WeatherCardComponent,
+    LocationNamePipe
+   ],
   imports: [
     BrowserModule,
     FormsModule,
