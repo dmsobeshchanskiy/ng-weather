@@ -1,7 +1,5 @@
-<button *ngFor="let tab of tabs; let i=index"
-        (click)="onTabClicked(tab, i)"
-        [ngClass]="{highlight: activeIndex === i}">
-    {{tab.caption || 'Tab ' + (i+1)}}
+<button *ngFor="let tab of tabs" (click)="onTabClicked(tab)" [ngClass]="{highlight: tab.active}">
+    {{tab.caption}}
     <span class="close-button" (click)="onCloseTabClick(tab, $event)">x</span>
 </button>
 <div>

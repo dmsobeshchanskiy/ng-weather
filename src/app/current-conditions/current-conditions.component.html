@@ -2,6 +2,7 @@
   <app-tabs>
     <ng-template *ngFor="let location of currentConditionsByZip()" 
                   [appTab]="location | locationName"
+                  [active]="locationService.lastAddedLocationSignal() === location.zip"
                   (closeTabClicked)="locationService.removeLocation(location.zip)">
       <app-weather-card [location]="location"></app-weather-card>
     </ng-template>
