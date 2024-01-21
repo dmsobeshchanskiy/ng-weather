@@ -35,6 +35,8 @@ export class LocationService {
     const currentLocations = this.locationSignal();
     if (currentLocations.indexOf(zipcode) === -1) {
       this.locationSignal.update((locations) => [...locations, zipcode]);
+    } else {
+      this.locationSignal.update((locations) => [...locations]);
     }
     this.lastAddedLocation.set(zipcode);
   }
