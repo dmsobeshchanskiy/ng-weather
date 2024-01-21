@@ -32,8 +32,11 @@ export class LocationService {
     if (!zipcode || zipcode.length === 0) {
       return;
     }
+    const currentLocations = this.locationSignal();
+    if (currentLocations.indexOf(zipcode) === -1) {
+      this.locationSignal.update((locations) => [...locations, zipcode]);
+    }
     this.lastAddedLocation.set(zipcode);
-    this.locationSignal.update((locations) => [...locations, zipcode]);
   }
 
   public removeLocation(zipcode : string): void {

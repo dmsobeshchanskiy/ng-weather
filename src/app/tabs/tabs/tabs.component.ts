@@ -15,6 +15,8 @@ export class TabsComponent {
     if (this.tabs && this.tabs.length > 0) {
       this.ensureActiveTab();
       this.defineTemplateToRender();
+    } else {
+      this.templateToRender = undefined;
     }
   };
 

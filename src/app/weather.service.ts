@@ -27,13 +27,17 @@ export class WeatherService {
     toObservable(this.locationService.getLocationsSignal()).pipe(
       tap(zipCodes => this.zipCodes = zipCodes),
       switchMap(zipCodes => {
-        return forkJoin(zipCodes.map(zipcode => {
-          return this.http.get<CurrentConditions>(WeatherService.WEATHERURL, { params: this.getWeatherParams(zipcode)})
-                .pipe(catchError(e => {
-                  console.error('Error while getting condition: ', e);
-                  return of(undefined);
-                }))
-        }))
+        if (zipCodes.length) {
+          return forkJoin(zipCodes.map(zipcode => {
+            return this.http.get<CurrentConditions>(WeatherService.WEATHERURL, { params: this.getWeatherParams(zipcode)})
+                  .pipe(catchError(e => {
+                    console.error('Error while getting condition: ', e);
+                    return of(undefined);
+                  }))
+          }))
+        } else {
+          return of([]);
+        }
       }),
       catchError(e => of([]))
     ).subscribe(conditions => this.applyConditions(conditions));
