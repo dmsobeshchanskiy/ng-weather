@@ -6,7 +6,7 @@ import { ConditionsAndZip } from '../models/conditions-and-zip.type';
 })
 export class LocationNamePipe implements PipeTransform {
 
-  public transform(location: ConditionsAndZip): any {
+  public transform(location: ConditionsAndZip): string {
     return `${location.data.name} (${location.zip})`
   }
 
