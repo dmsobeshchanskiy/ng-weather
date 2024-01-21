@@ -14,18 +14,16 @@ import { API_URL, APPID, FORECAST_ACTION, ICON_URL, WEATHER_ACTION } from './con
 @Injectable()
 export class WeatherService {
 
-  static WEATHERURL = API_URL + WEATHER_ACTION;
-  static FORECASTURL = API_URL + FORECAST_ACTION;
+  static readonly WEATHERURL = API_URL + WEATHER_ACTION;
+  static readonly FORECASTURL = API_URL + FORECAST_ACTION;
 
   private currentConditions = signal<ConditionsAndZip[]>([]);
-
-  // TODO: try to remove this
   private zipCodes: string[];
 
   constructor(private http: HttpClient, 
               private locationService: LocationService) {
     toObservable(this.locationService.getLocationsSignal()).pipe(
-      tap(zipCodes => { this.zipCodes = zipCodes; console.log('weather service, loc changed: ', zipCodes)}),
+      tap(zipCodes => this.zipCodes = zipCodes),
       switchMap(zipCodes => {
         if (zipCodes.length) {
           return forkJoin(zipCodes.map(zipcode => {
