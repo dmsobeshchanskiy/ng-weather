@@ -55,6 +55,19 @@ export class LocationService {
     }
   }
 
+  public removeNotFoundLocations(notFoundZipcodes: string[]): void {
+    if (!notFoundZipcodes || notFoundZipcodes.length === 0) {
+      return
+    }
+    alert(`Location(s) ${notFoundZipcodes.join(', ')} not found!`);
+    this.locationSignal.update((locations) => {
+      locations = locations.filter(loc => !notFoundZipcodes.find(z => z === loc));
+      return locations;
+    });
+    const locations = this.locationSignal();
+    this.lastAddedLocation.set(locations.length > 0 ? locations[0] : '');
+  }
+
   private getLocationToActivate(deletionIndex: number,
                                 currentLocations: string[]): string {
     let locationToActivate = '';

@@ -25,7 +25,7 @@ export class WeatherService {
   constructor(private http: HttpClient, 
               private locationService: LocationService) {
     toObservable(this.locationService.getLocationsSignal()).pipe(
-      tap(zipCodes => this.zipCodes = zipCodes),
+      tap(zipCodes => { this.zipCodes = zipCodes; console.log('weather service, loc changed: ', zipCodes)}),
       switchMap(zipCodes => {
         if (zipCodes.length) {
           return forkJoin(zipCodes.map(zipcode => {
@@ -88,12 +88,18 @@ export class WeatherService {
 
   private applyConditions(conditions: CurrentConditions[]): void {
     const zipConditions = [];
+    const notFoundLocations = [];
     for (let i = 0; i < this.zipCodes.length; i++) {
       if (conditions[i]) {
         zipConditions.push({zip: this.zipCodes[i], data: conditions[i]})
+      } else {
+        notFoundLocations.push(this.zipCodes[i]);
       }
     }
     this.currentConditions.set(zipConditions);
+    if (notFoundLocations.length) {
+      this.locationService.removeNotFoundLocations(notFoundLocations);
+    }
   }
 
   private getWeatherParams(zipcode: string): { } {

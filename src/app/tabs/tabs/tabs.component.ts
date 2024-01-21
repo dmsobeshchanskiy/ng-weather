@@ -11,7 +11,6 @@ export class TabsComponent {
   
   @ContentChildren(TabDirective)
   public set tabItems(value: QueryList<TabDirective>) {
-    console.log('set tabs: ', value);
     this.tabs = value.toArray();
     if (this.tabs && this.tabs.length > 0) {
       this.defineTemplateToRender();
