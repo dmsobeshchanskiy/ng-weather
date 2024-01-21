@@ -46,12 +46,23 @@ export class LocationService {
     const currentLocations = this.locationSignal();
     let index = currentLocations.indexOf(zipcode);
     if (index !== -1) {
-      this.lastAddedLocation.set(currentLocations.length > 0 ? currentLocations[0] : '');
+      this.lastAddedLocation.set(this.getLocationToActivate(index, currentLocations));
       this.locationSignal.update((locations) => {
         locations.splice(index, 1);
         return [...locations];
       });
 
     }
+  }
+
+  private getLocationToActivate(deletionIndex: number,
+                                currentLocations: string[]): string {
+    let locationToActivate = '';
+    if (deletionIndex < currentLocations.length - 1) {
+      locationToActivate = currentLocations[++deletionIndex];
+    } else if (deletionIndex > 0) {
+      locationToActivate = currentLocations[--deletionIndex];
+    }                            
+    return locationToActivate;
   }
 }

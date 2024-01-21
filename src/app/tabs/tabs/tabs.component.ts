@@ -63,7 +63,7 @@ export class TabsComponent {
     if (!this.tabs || this.tabs.length === 0) {
       this.templateToRender = undefined;
     } else {
-      this.templateToRender = this.tabs.find(t => t.tabId === this._activeTabId)?.templateRef ||
+      this.templateToRender = this.tabs.find(t => t.tabId === this.activeTabId)?.templateRef ||
                               this.tabs[0].templateRef;
     }
   }
