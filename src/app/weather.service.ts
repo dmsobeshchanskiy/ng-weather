@@ -45,19 +45,7 @@ export class WeatherService {
       }),
       catchError(e => of([]))
     ).subscribe((newConditions: ConditionsAndZip[]) => {
-      const newValidConditions = newConditions.filter(c => c.data);
-      const notValidConditions = newConditions.filter(c => !c.data);
-      if (newValidConditions.length) {
-        this.currentConditions.update((conditions) => {
-          return [...conditions, ...newValidConditions];
-        });
-        this.activateConditionForLocation(newValidConditions[0].zip);
-      }
-      if (notValidConditions.length) {
-        const notValidLocations = notValidConditions.map(l => l.zip);
-        this.locationService.removeLocations(notValidLocations);
-        alert(`Fail get weather for next condition(s): ${notValidLocations}`);
-      }
+      this.applyNewConditions(newConditions);
     });
 
     // another method
@@ -176,7 +164,26 @@ export class WeatherService {
           )
   }
 
+  private applyNewConditions(newConditions: ConditionsAndZip[]): void {
+    const newValidConditions = newConditions.filter(c => c.data);
+    const notValidConditions = newConditions.filter(c => !c.data);
+    if (newValidConditions.length) {
+      this.currentConditions.update((conditions) => {
+        return [...conditions, ...newValidConditions];
+      });
+      this.activateConditionForLocation(newValidConditions[0].zip);
+    }
+    if (notValidConditions.length) {
+      const notValidLocations = notValidConditions.map(l => l.zip);
+      this.locationService.removeLocations(notValidLocations);
+      alert(`Fail get weather for next locations(s): ${notValidLocations}`);
+    }
+  }
+
   private getLocationToActivateBeforeDeletion(zipcode: string): string {
+    if (this.currentlyActiveCondition() !== zipcode) {
+      return '';
+    }
     const currentLocations = this.currentConditions();
     const deletionIndex = currentLocations.findIndex(c => c.zip === zipcode);
     let locationToActivate = '';
