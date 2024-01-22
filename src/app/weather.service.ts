@@ -36,9 +36,7 @@ export class WeatherService {
       switchMap(zipcodes => {
         const zipsToCheck = this.getNotCheckedLocations(zipcodes);
         if (zipsToCheck.length) {
-          return forkJoin(zipsToCheck.map(zipcode => {
-            return this.callApiForWeather(zipcode)
-          }))
+          return forkJoin(zipsToCheck.map(zipcode => this.callApiForWeather(zipcode)))
         } else {
           return of([]);
         }
@@ -48,7 +46,6 @@ export class WeatherService {
       this.applyNewConditions(newConditions);
     });
 
-    // another method
     this.locationService.$duplicatedLocationAdded.subscribe(zipcode => {
         this.activateConditionForLocation(zipcode);
       });
@@ -59,7 +56,8 @@ export class WeatherService {
       return [];
     }
     const checkedZipCodes = this.currentConditions().map(c => c.zip);
-    const zipsToCheck = zipcodes.filter(zip => !checkedZipCodes.find(c => c === zip));
+    const zipsToCheck = zipcodes.filter(zip => isZipcodeValid(zip) &&
+                                        !checkedZipCodes.find(c => c === zip));
     return zipsToCheck;
   }
 
