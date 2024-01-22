@@ -1,7 +1,7 @@
 <div>
-  <app-tabs [activeTabId]="locationService.lastAddedLocationSignal()"
-            (activeTabIdChanged)="locationService.addLocation($event)"
-            (closeTabClicked)="locationService.removeLocation($event)">
+  <app-tabs [activeTabId]="this.weatherService.currentlyActiveConditionSignal()"
+            (activeTabIdChanged)="weatherService.activateConditionForLocation($event)"
+            (closeTabClicked)="weatherService.removeConditionForLocation($event)">
     <ng-template *ngFor="let location of currentConditionsByZip()" 
                   [appTab]="location | locationName"
                   [tabId]="location.zip">

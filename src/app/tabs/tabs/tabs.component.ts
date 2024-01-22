@@ -48,7 +48,6 @@ export class TabsComponent {
   public onTabClicked(tab: TabDirective): void {
     if (this.activeTabId !== tab.tabId) {
       this.activeTabIdChanged.emit(tab.tabId);
-      this.activeTabId = tab.tabId;
     }
   }
 
