@@ -54,14 +54,14 @@ export class WeatherService {
         this.activateConditionForLocation(newValidConditions[0].zip);
       }
       if (notValidConditions.length) {
-        alert(`Fail get weather for next condition(s): 
-              ${notValidConditions.map(l => l.zip)}`);
+        const notValidLocations = notValidConditions.map(l => l.zip);
+        this.locationService.removeLocations(notValidLocations);
+        alert(`Fail get weather for next condition(s): ${notValidLocations}`);
       }
     });
 
     // another method
-    toObservable(this.locationService.duplicatedLocationAddedSignal)
-      .subscribe(zipcode => {
+    this.locationService.$duplicatedLocationAdded.subscribe(zipcode => {
         this.activateConditionForLocation(zipcode);
       });
   }
@@ -103,9 +103,10 @@ export class WeatherService {
       return conditions;
     });
     this.activateConditionForLocation(conditionToActivate);
-    this.locationService.removeLocation(zipcode);
+    this.locationService.removeLocations([zipcode]);
   }
 
+  // for non-reactive approach
   public addCurrentConditions(zipcode: string): void {
     if (!isZipcodeValid(zipcode)) {
       return;

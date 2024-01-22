@@ -1,21 +1,22 @@
 import { Injectable, Signal, effect, signal } from '@angular/core';
 import { isZipcodeValid } from './tools';
+import { Observable, Subject } from 'rxjs';
 
 export const LOCATIONS : string = "locations";
 
 @Injectable()
 export class LocationService {
 
+  public get $duplicatedLocationAdded(): Observable<string> {
+    return this.duplicatedLocationAdded.asObservable();
+  }
+
   public getLocationsSignal(): Signal<string[]> {
     return this.locationSignal.asReadonly();
   }
-
-  public get duplicatedLocationAddedSignal(): Signal<string> {
-    return this.duplicatedLocationSignal.asReadonly();
-  }
-
   private locationSignal = signal<string[]>([]);
-  private duplicatedLocationSignal = signal<string>('');
+
+  private duplicatedLocationAdded: Subject<string> = new Subject();
 
   constructor() {
     let locString = localStorage.getItem(LOCATIONS);
@@ -36,16 +37,16 @@ export class LocationService {
     if (currentLocations.indexOf(zipcode) === -1) {
       this.locationSignal.update((locations) => [...locations, zipcode]);
     } else {
-      this.duplicatedLocationSignal.set(zipcode);
+      this.duplicatedLocationAdded.next(zipcode);
     }
   }
 
-  public removeLocation(zipcode : string): void {
-    if (!isZipcodeValid(zipcode)) {
+  public removeLocations(zipcodes : string[]): void {
+    if (!zipcodes) {
       return;
     }
     this.locationSignal.update((locations) => {
-      locations = locations.filter(l => l !== zipcode);
+      locations = locations.filter(l => !zipcodes.find(zc => zc === l));
       return locations;
     });
   }
